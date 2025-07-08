@@ -13,7 +13,7 @@ FEED_URL = "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-a
 STATION_ID = "A46"  # Utica Av (A/C)
 LINES = {"A", "C"}
 DIRECTIONS = {"N": "Manhattan-bound", "S": "Brooklyn-bound"}
-IMG_SIZE = (1072, 1448)  # Kindle Paperwhite 7th Gen resolution
+IMG_SIZE = (1448, 1072)  # Landscape: width x height
 FONT_PATH = None  # Use default PIL font
 NY_TZ = pytz.timezone("America/New_York")
 
@@ -44,18 +44,17 @@ def fetch_departures():
             if dep_dt < now:
                 continue
             departures[direction].append((dep_dt, route_id))
-    # Sort and keep next 3 for each direction
+    # Sort and keep next 4 for each direction
     for dir in departures:
-        departures[dir] = sorted(departures[dir])[:3]
+        departures[dir] = sorted(departures[dir])[:4]
     return departures
 
 
-def draw_train_logo(draw, x, y, letter, size=48):
+def draw_train_logo(draw, x, y, letter, size=64):
     # Draw a black circle with a white letter inside
     radius = size // 2
     draw.ellipse((x, y, x + size, y + size), fill=0)
     font = ImageFont.load_default()
-    # Try to center the letter
     bbox = draw.textbbox((0, 0), letter, font=font)
     w, h = bbox[2] - bbox[0], bbox[3] - bbox[1]
     text_x = x + (size - w) // 2
@@ -82,42 +81,40 @@ def make_image(departures):
     now_str = datetime.datetime.now(NY_TZ).strftime("%Y-%m-%d %I:%M %p")
     bbox = draw.textbbox((0, 0), now_str, font=font_time)
     w, h = bbox[2] - bbox[0], bbox[3] - bbox[1]
-    draw.text(((IMG_SIZE[0] - w) // 2, 100), now_str, font=font_time, fill=0)
+    draw.text(((IMG_SIZE[0] - w) // 2, 120), now_str, font=font_time, fill=0)
 
     # Column headers
-    col_margin = 80
+    col_margin = 100
     col_width = (IMG_SIZE[0] - 2 * col_margin) // 2
     col1_x = col_margin
     col2_x = col_margin + col_width
-    y_start = 180
+    y_start = 220
     y = y_start
     draw.text((col1_x, y), "Manhattan-bound", font=font_header, fill=0)
     draw.text((col2_x, y), "Brooklyn-bound", font=font_header, fill=0)
-    y += 50
+    y += 60
 
     max_rows = max(len(departures["N"]), len(departures["S"]))
-    max_rows = max(max_rows, 3)
-    row_height = 80
-    logo_size = 48
+    max_rows = max(max_rows, 4)
+    row_height = 100
+    logo_size = 64
     for i in range(max_rows):
         # Manhattan-bound (N)
         if i < len(departures["N"]):
             dep_dt, route_id = departures["N"][i]
             time_str = dep_dt.strftime("%I:%M %p")
-            # Draw logo
             draw_train_logo(draw, col1_x, y, route_id, size=logo_size)
-            # Draw time
-            draw.text((col1_x + logo_size + 20, y + 8), time_str, font=font_dep, fill=0)
+            draw.text((col1_x + logo_size + 30, y + 18), time_str, font=font_dep, fill=0)
         else:
-            draw.text((col1_x, y + 8), "-", font=font_dep, fill=128)
+            draw.text((col1_x, y + 18), "-", font=font_dep, fill=128)
         # Brooklyn-bound (S)
         if i < len(departures["S"]):
             dep_dt, route_id = departures["S"][i]
             time_str = dep_dt.strftime("%I:%M %p")
             draw_train_logo(draw, col2_x, y, route_id, size=logo_size)
-            draw.text((col2_x + logo_size + 20, y + 8), time_str, font=font_dep, fill=0)
+            draw.text((col2_x + logo_size + 30, y + 18), time_str, font=font_dep, fill=0)
         else:
-            draw.text((col2_x, y + 8), "-", font=font_dep, fill=128)
+            draw.text((col2_x, y + 18), "-", font=font_dep, fill=128)
         y += row_height
     return img
 
