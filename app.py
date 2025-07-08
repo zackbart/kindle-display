@@ -62,11 +62,12 @@ def draw_train_logo(draw, x, y, letter, size=56):
 def make_image(departures):
     img = Image.new("L", IMG_SIZE, color=255)
     draw = ImageDraw.Draw(img)
-    # Use default PIL font for all text
-    font_title = ImageFont.load_default()
-    font_time = ImageFont.load_default()
-    font_header = ImageFont.load_default()
-    font_dep = ImageFont.load_default()
+    # Use bundled TTF font for all text
+    font_path = "DejaVuSans-Bold.ttf"
+    font_title = ImageFont.truetype(font_path, 60)
+    font_time = ImageFont.truetype(font_path, 40)
+    font_header = ImageFont.truetype(font_path, 40)
+    font_dep = ImageFont.truetype(font_path, 36)
 
     # Centered title
     title = "Utica Av (A/C)"
@@ -78,34 +79,34 @@ def make_image(departures):
     now_str = datetime.datetime.now(NY_TZ).strftime("%Y-%m-%d %I:%M %p")
     bbox = draw.textbbox((0, 0), now_str, font=font_time)
     w, h = bbox[2] - bbox[0], bbox[3] - bbox[1]
-    draw.text(((IMG_SIZE[0] - w) // 2, 100), now_str, font=font_time, fill=0)
+    draw.text(((IMG_SIZE[0] - w) // 2, 120), now_str, font=font_time, fill=0)
 
     # Manhattan-bound section
-    y = 180
+    y = 200
     draw.text((40, y), "Manhattan-bound", font=font_header, fill=0)
-    y += 50
+    y += 60
     logo_size = 56
-    row_height = 70
+    row_height = 80
     for i in range(4):
         if i < len(departures["N"]):
             dep_dt, route_id = departures["N"][i]
             time_str = dep_dt.strftime("%I:%M %p")
             draw_train_logo(draw, 60, y, route_id, size=logo_size)
-            draw.text((60 + logo_size + 30, y + 10), time_str, font=font_dep, fill=0)
+            draw.text((60 + logo_size + 40, y + 10), time_str, font=font_dep, fill=0)
         else:
             draw.text((60, y + 10), "-", font=font_dep, fill=128)
         y += row_height
 
     # Brooklyn-bound section
-    y += 30
+    y += 40
     draw.text((40, y), "Brooklyn-bound", font=font_header, fill=0)
-    y += 50
+    y += 60
     for i in range(4):
         if i < len(departures["S"]):
             dep_dt, route_id = departures["S"][i]
             time_str = dep_dt.strftime("%I:%M %p")
             draw_train_logo(draw, 60, y, route_id, size=logo_size)
-            draw.text((60 + logo_size + 30, y + 10), time_str, font=font_dep, fill=0)
+            draw.text((60 + logo_size + 40, y + 10), time_str, font=font_dep, fill=0)
         else:
             draw.text((60, y + 10), "-", font=font_dep, fill=128)
         y += row_height
