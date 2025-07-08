@@ -23,6 +23,7 @@ def fetch_departures():
     feed = gtfs_realtime_pb2.FeedMessage()
     feed.ParseFromString(resp.content)
     now = datetime.datetime.now(NY_TZ)
+    min_delta = datetime.timedelta(minutes=5)
     departures = {"N": [], "S": []}
     for entity in feed.entity:
         if not entity.HasField("trip_update"):
@@ -40,7 +41,8 @@ def fetch_departures():
                 continue
             dep_time = stop_time_update.departure.time if stop_time_update.HasField("departure") else stop_time_update.arrival.time
             dep_dt = datetime.datetime.fromtimestamp(dep_time, NY_TZ)
-            if dep_dt < now:
+            # Only include trains 5 minutes or more away
+            if dep_dt - now < min_delta:
                 continue
             departures[direction].append((dep_dt, route_id))
     for dir in departures:
@@ -66,7 +68,7 @@ def make_image(departures):
     font_title = ImageFont.truetype(font_path, 90)
     font_time = ImageFont.truetype(font_path, 60)
     font_header = ImageFont.truetype(font_path, 54)
-    font_dep = ImageFont.truetype(font_path, 52)
+    font_dep = ImageFont.truetype(font_path, 80)  # Increased for arrival time
     font_logo = ImageFont.truetype(font_path, 120)
 
     # Centered title
@@ -95,18 +97,19 @@ def make_image(departures):
             dep_dt, route_id = departures["N"][i]
             time_str = dep_dt.strftime("%I:%M %p")
             # Draw large train logo (centered vertically in row)
-            logo_x = (IMG_SIZE[0] - (logo_size + 60 + 320)) // 2
+            logo_x = (IMG_SIZE[0] - (logo_size + 60 + 400)) // 2
             logo_y = y
             # Draw black circle
             draw.ellipse((logo_x, logo_y, logo_x + logo_size, logo_y + logo_size), fill=0)
-            # Draw white train letter centered
-            bbox = draw.textbbox((0, 0), route_id, font=font_logo)
-            lw, lh = bbox[2] - bbox[0], bbox[3] - bbox[1]
-            text_x = logo_x + (logo_size - lw) // 2
-            text_y = logo_y + (logo_size - lh) // 2
-            draw.text((text_x, text_y), route_id, font=font_logo, fill=255)
-            # Draw time, large, to the right of the logo
-            draw.text((logo_x + logo_size + 60, logo_y + (logo_size - 80) // 2), time_str, font=font_dep, fill=0)
+            # Draw white train letter centered using anchor
+            center_x = logo_x + logo_size // 2
+            center_y = logo_y + logo_size // 2
+            draw.text((center_x, center_y), route_id, font=font_logo, fill=255, anchor="mm")
+            # Draw time, large, to the right of the logo, vertically centered
+            bbox_time = draw.textbbox((0, 0), time_str, font=font_dep)
+            time_h = bbox_time[3] - bbox_time[1]
+            time_y = logo_y + (logo_size - time_h) // 2
+            draw.text((logo_x + logo_size + 60, time_y), time_str, font=font_dep, fill=0)
         else:
             # Draw a dash centered
             dash = "-"
