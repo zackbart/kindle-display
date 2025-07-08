@@ -63,11 +63,11 @@ def make_image(departures):
     img = Image.new("L", IMG_SIZE, color=255)
     draw = ImageDraw.Draw(img)
     font_path = "DejaVuSans-Bold.ttf"
-    font_title = ImageFont.truetype(font_path, 70)
-    font_time = ImageFont.truetype(font_path, 48)
-    font_header = ImageFont.truetype(font_path, 44)
-    font_dep = ImageFont.truetype(font_path, 40)
-    font_logo = ImageFont.truetype(font_path, 80)
+    font_title = ImageFont.truetype(font_path, 90)
+    font_time = ImageFont.truetype(font_path, 60)
+    font_header = ImageFont.truetype(font_path, 54)
+    font_dep = ImageFont.truetype(font_path, 52)
+    font_logo = ImageFont.truetype(font_path, 120)
 
     # Centered title
     title = "Utica Av (A/C)"
@@ -79,23 +79,23 @@ def make_image(departures):
     now_str = datetime.datetime.now(NY_TZ).strftime("%Y-%m-%d %I:%M %p")
     bbox = draw.textbbox((0, 0), now_str, font=font_time)
     w, h = bbox[2] - bbox[0], bbox[3] - bbox[1]
-    draw.text(((IMG_SIZE[0] - w) // 2, 120), now_str, font=font_time, fill=0)
+    draw.text(((IMG_SIZE[0] - w) // 2, 150), now_str, font=font_time, fill=0)
 
     # Manhattan-bound section only
-    y = 220
+    y = 270
     header = "Manhattan-bound"
     bbox = draw.textbbox((0, 0), header, font=font_header)
     w, h = bbox[2] - bbox[0], bbox[3] - bbox[1]
     draw.text(((IMG_SIZE[0] - w) // 2, y), header, font=font_header, fill=0)
-    y += 70
-    logo_size = 100
-    row_height = 120
+    y += 90
+    logo_size = 150
+    row_height = 160
     for i in range(4):
         if i < len(departures["N"]):
             dep_dt, route_id = departures["N"][i]
             time_str = dep_dt.strftime("%I:%M %p")
             # Draw large train logo (centered vertically in row)
-            logo_x = (IMG_SIZE[0] - (logo_size + 40 + 200)) // 2
+            logo_x = (IMG_SIZE[0] - (logo_size + 60 + 320)) // 2
             logo_y = y
             # Draw black circle
             draw.ellipse((logo_x, logo_y, logo_x + logo_size, logo_y + logo_size), fill=0)
@@ -106,7 +106,7 @@ def make_image(departures):
             text_y = logo_y + (logo_size - lh) // 2
             draw.text((text_x, text_y), route_id, font=font_logo, fill=255)
             # Draw time, large, to the right of the logo
-            draw.text((logo_x + logo_size + 40, logo_y + (logo_size - 60) // 2), time_str, font=font_dep, fill=0)
+            draw.text((logo_x + logo_size + 60, logo_y + (logo_size - 80) // 2), time_str, font=font_dep, fill=0)
         else:
             # Draw a dash centered
             dash = "-"
