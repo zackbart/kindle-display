@@ -62,12 +62,12 @@ def draw_train_logo(draw, x, y, letter, size=56):
 def make_image(departures):
     img = Image.new("L", IMG_SIZE, color=255)
     draw = ImageDraw.Draw(img)
-    # Use bundled TTF font for all text
     font_path = "DejaVuSans-Bold.ttf"
-    font_title = ImageFont.truetype(font_path, 60)
-    font_time = ImageFont.truetype(font_path, 40)
-    font_header = ImageFont.truetype(font_path, 40)
-    font_dep = ImageFont.truetype(font_path, 36)
+    font_title = ImageFont.truetype(font_path, 70)
+    font_time = ImageFont.truetype(font_path, 48)
+    font_header = ImageFont.truetype(font_path, 44)
+    font_dep = ImageFont.truetype(font_path, 40)
+    font_logo = ImageFont.truetype(font_path, 80)
 
     # Centered title
     title = "Utica Av (A/C)"
@@ -81,34 +81,38 @@ def make_image(departures):
     w, h = bbox[2] - bbox[0], bbox[3] - bbox[1]
     draw.text(((IMG_SIZE[0] - w) // 2, 120), now_str, font=font_time, fill=0)
 
-    # Manhattan-bound section
-    y = 200
-    draw.text((40, y), "Manhattan-bound", font=font_header, fill=0)
-    y += 60
-    logo_size = 56
-    row_height = 80
+    # Manhattan-bound section only
+    y = 220
+    header = "Manhattan-bound"
+    bbox = draw.textbbox((0, 0), header, font=font_header)
+    w, h = bbox[2] - bbox[0], bbox[3] - bbox[1]
+    draw.text(((IMG_SIZE[0] - w) // 2, y), header, font=font_header, fill=0)
+    y += 70
+    logo_size = 100
+    row_height = 120
     for i in range(4):
         if i < len(departures["N"]):
             dep_dt, route_id = departures["N"][i]
             time_str = dep_dt.strftime("%I:%M %p")
-            draw_train_logo(draw, 60, y, route_id, size=logo_size)
-            draw.text((60 + logo_size + 40, y + 10), time_str, font=font_dep, fill=0)
+            # Draw large train logo (centered vertically in row)
+            logo_x = (IMG_SIZE[0] - (logo_size + 40 + 200)) // 2
+            logo_y = y
+            # Draw black circle
+            draw.ellipse((logo_x, logo_y, logo_x + logo_size, logo_y + logo_size), fill=0)
+            # Draw white train letter centered
+            bbox = draw.textbbox((0, 0), route_id, font=font_logo)
+            lw, lh = bbox[2] - bbox[0], bbox[3] - bbox[1]
+            text_x = logo_x + (logo_size - lw) // 2
+            text_y = logo_y + (logo_size - lh) // 2
+            draw.text((text_x, text_y), route_id, font=font_logo, fill=255)
+            # Draw time, large, to the right of the logo
+            draw.text((logo_x + logo_size + 40, logo_y + (logo_size - 60) // 2), time_str, font=font_dep, fill=0)
         else:
-            draw.text((60, y + 10), "-", font=font_dep, fill=128)
-        y += row_height
-
-    # Brooklyn-bound section
-    y += 40
-    draw.text((40, y), "Brooklyn-bound", font=font_header, fill=0)
-    y += 60
-    for i in range(4):
-        if i < len(departures["S"]):
-            dep_dt, route_id = departures["S"][i]
-            time_str = dep_dt.strftime("%I:%M %p")
-            draw_train_logo(draw, 60, y, route_id, size=logo_size)
-            draw.text((60 + logo_size + 40, y + 10), time_str, font=font_dep, fill=0)
-        else:
-            draw.text((60, y + 10), "-", font=font_dep, fill=128)
+            # Draw a dash centered
+            dash = "-"
+            bbox = draw.textbbox((0, 0), dash, font=font_dep)
+            w, h = bbox[2] - bbox[0], bbox[3] - bbox[1]
+            draw.text(((IMG_SIZE[0] - w) // 2, y + (logo_size - h) // 2), dash, font=font_dep, fill=128)
         y += row_height
     return img
 
