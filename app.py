@@ -67,8 +67,7 @@ def make_image(departures):
     font_path = "DejaVuSans-Bold.ttf"
     font_title = ImageFont.truetype(font_path, 90)
     font_time = ImageFont.truetype(font_path, 60)
-    font_header = ImageFont.truetype(font_path, 54)
-    font_dep = ImageFont.truetype(font_path, 80)  # Increased for arrival time
+    font_dep = ImageFont.truetype(font_path, 80)
     font_logo = ImageFont.truetype(font_path, 120)
 
     # Centered title
@@ -77,19 +76,15 @@ def make_image(departures):
     w, h = bbox[2] - bbox[0], bbox[3] - bbox[1]
     draw.text(((IMG_SIZE[0] - w) // 2, 30), title, font=font_title, fill=0)
 
-    # Centered current time
-    now_str = datetime.datetime.now(NY_TZ).strftime("%Y-%m-%d %I:%M %p")
+    # Centered current time (directly below title)
+    now_dt = datetime.datetime.now(NY_TZ)
+    now_str = now_dt.strftime("%I:%M %p")
     bbox = draw.textbbox((0, 0), now_str, font=font_time)
     w, h = bbox[2] - bbox[0], bbox[3] - bbox[1]
-    draw.text(((IMG_SIZE[0] - w) // 2, 150), now_str, font=font_time, fill=0)
+    draw.text(((IMG_SIZE[0] - w) // 2, 130), now_str, font=font_time, fill=0)
 
-    # Manhattan-bound section only
-    y = 270
-    header = "Manhattan-bound"
-    bbox = draw.textbbox((0, 0), header, font=font_header)
-    w, h = bbox[2] - bbox[0], bbox[3] - bbox[1]
-    draw.text(((IMG_SIZE[0] - w) // 2, y), header, font=font_header, fill=0)
-    y += 90
+    # Only show Manhattan-bound departures, no header
+    y = 230
     logo_size = 150
     row_height = 160
     for i in range(4):
