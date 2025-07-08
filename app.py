@@ -7,8 +7,8 @@ from google.transit import gtfs_realtime_pb2
 
 app = Flask(__name__)
 
-# Constants
-FEED_URL = "http://gtfsrt.prod.mta.info/feed/nyct%2Fgtfs"  # Public feed, update if needed
+# Updated feed URL for A/C/E lines, no API key required
+FEED_URL = "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-ace"
 STATION_ID = "A46"  # Utica Av (A/C)
 LINES = {"A", "C"}
 DIRECTIONS = {"N": "Manhattan-bound", "S": "Brooklyn-bound"}
