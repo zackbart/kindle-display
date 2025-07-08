@@ -2,4 +2,5 @@ Flask
 Pillow
 requests
 gtfs-realtime-bindings
-protobuf 
+protobuf
+pytz 
