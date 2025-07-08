@@ -62,11 +62,11 @@ def draw_train_logo(draw, x, y, letter, size=56):
 def make_image(departures):
     img = Image.new("L", IMG_SIZE, color=255)
     draw = ImageDraw.Draw(img)
-    # Use larger font for title and time
-    font_title = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 48) if FONT_PATH is None else ImageFont.truetype(FONT_PATH, 48)
-    font_time = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 36) if FONT_PATH is None else ImageFont.truetype(FONT_PATH, 36)
-    font_header = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 36) if FONT_PATH is None else ImageFont.truetype(FONT_PATH, 36)
-    font_dep = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 32) if FONT_PATH is None else ImageFont.truetype(FONT_PATH, 32)
+    # Use default PIL font for all text
+    font_title = ImageFont.load_default()
+    font_time = ImageFont.load_default()
+    font_header = ImageFont.load_default()
+    font_dep = ImageFont.load_default()
 
     # Centered title
     title = "Utica Av (A/C)"
