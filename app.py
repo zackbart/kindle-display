@@ -13,7 +13,8 @@ FEED_URL = "https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-a
 STATION_ID = "A46"  # Utica Av (A/C)
 LINES = {"A", "C"}
 DIRECTIONS = {"N": "Manhattan-bound", "S": "Brooklyn-bound"}
-IMG_SIZE = (1448, 1072)  # Landscape: width x height
+# Update image size for Paperwhite 3 landscape
+IMG_SIZE = (1072, 758)  # width x height for Paperwhite 3 landscape
 FONT_PATH = None  # Use default PIL font
 NY_TZ = pytz.timezone("America/New_York")
 
@@ -138,6 +139,26 @@ def kindle_image():
     img.save(buf, format="PNG")
     buf.seek(0)
     return send_file(buf, mimetype="image/png")
+
+
+@app.route("/")
+def kindle_html():
+    html = '''
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta http-equiv="refresh" content="30">
+      <style>
+        body { background: #fff; margin: 0; padding: 0; }
+        img { display: block; margin: 0 auto; max-width: 100vw; max-height: 100vh; }
+      </style>
+    </head>
+    <body>
+      <img src="/kindle.png" alt="Train Times" />
+    </body>
+    </html>
+    '''
+    return html
 
 
 if __name__ == "__main__":
