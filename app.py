@@ -56,7 +56,8 @@ def draw_train_logo(draw, x, y, letter, size=48):
     draw.ellipse((x, y, x + size, y + size), fill=0)
     font = ImageFont.load_default()
     # Try to center the letter
-    w, h = draw.textsize(letter, font=font)
+    bbox = draw.textbbox((0, 0), letter, font=font)
+    w, h = bbox[2] - bbox[0], bbox[3] - bbox[1]
     text_x = x + (size - w) // 2
     text_y = y + (size - h) // 2
     draw.text((text_x, text_y), letter, font=font, fill=255)
@@ -73,12 +74,14 @@ def make_image(departures):
 
     # Centered title
     title = "Utica Av (A/C)"
-    w, h = draw.textsize(title, font=font_title)
+    bbox = draw.textbbox((0, 0), title, font=font_title)
+    w, h = bbox[2] - bbox[0], bbox[3] - bbox[1]
     draw.text(((IMG_SIZE[0] - w) // 2, 40), title, font=font_title, fill=0)
 
     # Centered current time
     now_str = datetime.datetime.now(NY_TZ).strftime("%Y-%m-%d %I:%M %p")
-    w, h = draw.textsize(now_str, font=font_time)
+    bbox = draw.textbbox((0, 0), now_str, font=font_time)
+    w, h = bbox[2] - bbox[0], bbox[3] - bbox[1]
     draw.text(((IMG_SIZE[0] - w) // 2, 100), now_str, font=font_time, fill=0)
 
     # Column headers
